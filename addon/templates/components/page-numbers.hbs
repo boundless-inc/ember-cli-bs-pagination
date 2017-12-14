@@ -1,0 +1,29 @@
+<nav>
+  <ul class="pagination">
+    <li class="page-item {{unless canStepBackward 'disabled'}}">
+      {{#if canStepBackward}}
+        <a class="page-link" href={{previousPageUrl}} onclick={{action 'decrementPage'}}>Previous</a>
+      {{else}}
+        <span class="page-link">Previous</span>
+      {{/if}}
+    </li>
+    {{#each pageItems as |pageItem index|}}
+      <li class="page-item {{if pageItem.current 'disabled' ''}}">
+        {{#if pageItem.current}}
+          <span class="page-link">
+            {{pageItem.number}}<span class="sr-only">(current)</span>
+          </span>
+        {{else}}
+          <a class="page-link" href="{{pageItem.url}}" onclick={{action 'setPage' pageItem.number}}>{{pageItem.number}}</a>
+        {{/if}}
+      </li>
+    {{/each}}
+    <li class="page-item {{unless canStepForward 'disabled'}}">
+      {{#if canStepForward}}
+        <a class="page-link" href={{nextPageUrl}} onclick={{action 'incrementPage'}}>Next</a>
+      {{else}}
+        <span class="page-link">Next</span>
+      {{/if}}
+    </li>
+  </ul>
+</nav>
