@@ -15,7 +15,6 @@ What it does not do:
 - cook you bacon
 
 What it will do (roadmap):
-- support `perPage` argument
 - support `innerWindow` argument (how many links are shown around the current page)
 - support `outerWindow` argument (how many links are around the first and the last page)
 - support rendering a pagination summary
@@ -23,6 +22,10 @@ What it will do (roadmap):
 What it depends on:
 - handlebars
 - [ember-uri-shim](https://github.com/spieker/ember-uri-shim)
+
+Configuration options:
+- `additionalClasses` will be added to the `ul.pagination` node. Use `pagination-sm` or `pagination-lg` for sizing, use [flexbox utilites](http://getbootstrap.com/docs/4.0/utilities/flex/) for alignment (eg `justify-content-center`).
+- If you would prefer to use "actions up" instead of two-way binding for `page`, pass `_setPage=(action mySetPageAction)` and your action will receive the new value of page as an argument.
 
 ## Installation & Usage
 - Install

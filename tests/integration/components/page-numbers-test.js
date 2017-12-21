@@ -63,3 +63,18 @@ test('clicking Next increments the page number', function(assert) {
   this.$('a:contains("Next")').click();
   assert.equal(this.get('page'), 4);
 });
+
+test('passing a custom setPage action', function(assert) {
+  assert.expect(1);
+  this.set('customSetPage', function(page) {
+    assert.equal(page, 4);
+  });
+  this.render(hbs`{{page-numbers totalPages=5 page=3 _setPage=(action customSetPage)}}`);
+  this.$('a:contains("Next")').click();
+});
+
+test('supports adding classes to the ul.pagination node via additionalClasses argument', function(assert) {
+  this.render(hbs`{{page-numbers totalPages=5 page=2 additionalClasses='foo'}}`);
+  const paginationNode = this.$('ul.pagination.foo');
+  assert.ok(paginationNode.length);
+});
