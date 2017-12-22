@@ -4,6 +4,7 @@ import URI from 'uri';
 const { parseInt } = Number;
 
 export default Component.extend({
+  tagName: 'nav',
   pageItems: computed('totalPages', 'page', function() {
     const pages = [];
     const page = parseInt(get(this, 'page'));
