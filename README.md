@@ -21,7 +21,6 @@ What it will do (roadmap):
 
 What it depends on:
 - handlebars
-- [ember-uri-shim](https://github.com/spieker/ember-uri-shim)
 
 Configuration options:
 - `additionalClasses` will be added to the `ul.pagination` node. Use `pagination-sm` or `pagination-lg` for sizing, use [flexbox utilites](http://getbootstrap.com/docs/4.0/utilities/flex/) for alignment (eg `justify-content-center`).

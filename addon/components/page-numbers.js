@@ -1,10 +1,13 @@
 import Component from '@ember/component';
 import { get, set, computed } from '@ember/object';
-import URI from 'uri';
 const { parseInt } = Number;
 
 export default Component.extend({
   tagName: 'nav',
+  didReceiveAttrs() {
+    this._super(...arguments);
+    set(this, 'uri', window.location.href);
+  },
   pageItems: computed('totalPages', 'page', function() {
     const pages = [];
     const page = parseInt(get(this, 'page'));
@@ -47,10 +50,6 @@ export default Component.extend({
 
     return page + 1 <= totalPages;
   }),
-  didReceiveAttrs() {
-    this._super(...arguments);
-    set(this, 'uri', URI(window.location.href));
-  },
   actions: {
     setPage(number, event) {
       event.preventDefault();
@@ -71,12 +70,23 @@ export default Component.extend({
     set(this, 'page', number);
   },
   uriForPage(page) {
-    const uri = get(this, 'uri');
+    let uri = get(this, 'uri').split('?');
+    let search = uri[1] || '';
+    let params = {};
+    search.replace(/([^=&]+)=([^&]*)/g, function(m, key, value) {
+        params[decodeURIComponent(key)] = decodeURIComponent(value);
+    });
+
     if(parseInt(page) === 1) {
-      uri.removeSearch('page');
+      delete params['page'];
     } else {
-      uri.setSearch('page', page);
+      params['page'] = page;
     }
-    return uri.toString();
+    return [uri[0], this.paramsToSearch(params)].filter(s => s).join('?');
   },
+  paramsToSearch(params) {
+    return Object.keys(params).map(function(key) {
+      return [key, params[key]].join('=');
+    }).join('&');
+  }
 });
