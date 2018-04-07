@@ -1,12 +1,29 @@
 import Component from '@ember/component';
 import { get, set, computed } from '@ember/object';
+import { getOwner } from '@ember/application';
 const { parseInt } = Number;
 
 export default Component.extend({
   tagName: 'nav',
+  processCurrentUrl() {
+    let owner = getOwner(this);
+    let fastboot = owner.lookup('service:fastboot');
+    if(fastboot && get(fastboot, 'isFastBoot')) {
+      set(this, 'path', get(fastboot, 'request.path'));
+      set(this, 'params', get(fastboot, 'request.queryParams'));
+    } else {
+      set(this, 'path', window.location.pathname);
+      let search = window.location.href.split('?')[1] || '';
+      let params = {};
+      search.replace(/([^=&]+)=([^&]*)/g, function(m, key, value) {
+          params[decodeURIComponent(key)] = decodeURIComponent(value);
+      });
+      set(this, 'params', params);
+    }
+  },
   didReceiveAttrs() {
     this._super(...arguments);
-    set(this, 'uri', window.location.href);
+    this.processCurrentUrl();
   },
   pageItems: computed('totalPages', 'page', function() {
     const pages = [];
@@ -70,19 +87,14 @@ export default Component.extend({
     set(this, 'page', number);
   },
   uriForPage(page) {
-    let uri = get(this, 'uri').split('?');
-    let search = uri[1] || '';
-    let params = {};
-    search.replace(/([^=&]+)=([^&]*)/g, function(m, key, value) {
-        params[decodeURIComponent(key)] = decodeURIComponent(value);
-    });
+    let params = get(this, 'params');
 
     if(parseInt(page) === 1) {
       delete params['page'];
     } else {
       params['page'] = page;
     }
-    return [uri[0], this.paramsToSearch(params)].filter(s => s).join('?');
+    return [get(this, 'path'), this.paramsToSearch(params)].filter(s => s).join('?');
   },
   paramsToSearch(params) {
     return Object.keys(params).map(function(key) {
