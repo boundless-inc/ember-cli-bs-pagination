@@ -1,6 +1,6 @@
 {
   "name": "ember-cli-bs-pagination",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A simple pagination addon for ember.js, which renders bootstrap-based pagination links.",
   "keywords": [
     "ember-addon",
