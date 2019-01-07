@@ -6,7 +6,7 @@
       <span class="page-link">Previous</span>
     {{/if}}
   </li>
-  {{#each pageItems as |pageItem index|}}
+  {{#each visiblePageItems as |pageItem index|}}
     <li class="page-item {{if pageItem.current 'disabled' ''}}">
       {{#if pageItem.current}}
         <span class="page-link">
