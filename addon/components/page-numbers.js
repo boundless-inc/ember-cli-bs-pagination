@@ -1,10 +1,12 @@
 import Component from '@ember/component';
 import { get, set, computed } from '@ember/object';
 import { getOwner } from '@ember/application';
+import { A } from '@ember/array';
 const { parseInt } = Number;
 
 export default Component.extend({
   tagName: 'nav',
+  visiblePageCount: 5,
   processCurrentUrl() {
     let owner = getOwner(this);
     let fastboot = owner.lookup('service:fastboot');
@@ -25,47 +27,55 @@ export default Component.extend({
     this._super(...arguments);
     this.processCurrentUrl();
   },
-  pageItems: computed('totalPages', 'page', function() {
-    const pages = [];
-    const page = parseInt(get(this, 'page'));
-    for(let i=1; i <= get(this, 'totalPages'); i++) {
-      let pageItem = {
+  pageNumber: computed('page', function() {
+    return parseInt(this.get('page'), 10);
+  }),
+  pageCount: computed('totalPages', function() {
+    return parseInt(this.get('totalPages'), 10);
+  }),
+  pageItems: computed('pageCount', 'pageNumber', function() {
+    const pages = A();
+
+    for (let i=1; i <= this.get('pageCount'); i++) {
+      pages.push({
         number: i,
-        current: i === page,
-        url: this.uriForPage(page),
-      };
-      pages.push(pageItem);
+        current: i === this.get('pageNumber'),
+        url: this.uriForPage(this.get('pageNumber')),
+      });
     }
+
     return pages;
   }),
-  previousPageUrl: computed('page', 'canStepBackward', function() {
-    const page = parseInt(get(this, 'page'));
+  visiblePageItems: computed('pageItems.[]', 'visiblePageCount', function() {
+    let padding = Math.floor(this.get('visiblePageCount') / 2);
+    let minPage = Math.max(1, this.get('pageNumber') - padding);
+    let maxPage = Math.min(this.get('pageCount') + 1, minPage + this.get('visiblePageCount'));
 
-    if(get(this, 'canStepBackward')) {
-      return this.uriForPage(page - 1);
+    if (maxPage - minPage < this.get('pageCount')) {
+      minPage = maxPage - this.get('visiblePageCount');
+    }
+
+    return this.get('pageItems').slice(minPage - 1, maxPage - 1);
+  }),
+  previousPageUrl: computed('page', 'canStepBackward', function() {
+    if (this.canStepBackward) {
+      return this.uriForPage(this.get('pageNumber') - 1);
     } else {
       return '#';
     }
   }),
   nextPageUrl: computed('page', 'canStepForward', function() {
-    const page = parseInt(get(this, 'page'));
-
-    if(get(this, 'canStepForward')) {
-      return this.uriForPage(page + 1);
+    if (this.canStepForward) {
+      return this.uriForPage(this.get('pageNumber') + 1);
     } else {
       return '#';
     }
   }),
   canStepBackward: computed('page', function() {
-    const page = parseInt(get(this, 'page'));
-
-    return page - 1 >= 1;
+    return this.get('pageNumber') - 1 >= 1;
   }),
   canStepForward: computed('page', 'totalPages', function() {
-    const page = parseInt(get(this, 'page'));
-    const totalPages = parseInt(get(this, 'totalPages'));
-
-    return page + 1 <= totalPages;
+    return this.get('pageNumber') + 1 <= this.get('pageCount');
   }),
   actions: {
     setPage(number, event) {
@@ -74,13 +84,11 @@ export default Component.extend({
     },
     incrementPage(event) {
       event.preventDefault();
-      let page = parseInt(get(this, 'page'));
-      this._setPage(page + 1, event);
+      this._setPage(this.get('pageNumber') + 1, event);
     },
     decrementPage(event) {
       event.preventDefault();
-      let page = parseInt(get(this, 'page'));
-      this._setPage(page - 1, event);
+      this._setPage(this.get('pageNumber') - 1, event);
     },
   },
   _setPage(number) {
@@ -89,7 +97,7 @@ export default Component.extend({
   uriForPage(page) {
     let params = get(this, 'params');
 
-    if(parseInt(page) === 1) {
+    if (parseInt(page, 10) === 1) {
       delete params['page'];
     } else {
       params['page'] = page;

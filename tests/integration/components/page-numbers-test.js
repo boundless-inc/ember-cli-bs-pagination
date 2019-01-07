@@ -8,12 +8,12 @@ moduleForComponent('page-numbers', 'Integration | Component | page numbers', {
 test('it renders links for each page except current, plus previous & next', function(assert) {
   this.render(hbs`{{page-numbers totalPages=5 page=2}}`);
 
+  // Prev + 5 pages + Next = 7 page item links
+  assert.equal(7, this.$('.page-item').length);
+
   assert.ok(this.$('a:contains("Previous")').length);
   assert.ok(this.$('a:contains("1")').length);
-
-  assert.notOk(this.$('a:contains("2")').length);
   assert.ok(this.$('span:contains("2")').length);
-
   assert.ok(this.$('a:contains("3")').length);
   assert.ok(this.$('a:contains("4")').length);
   assert.ok(this.$('a:contains("5")').length);
@@ -77,4 +77,79 @@ test('supports adding classes to the ul.pagination node via additionalClasses ar
   this.render(hbs`{{page-numbers totalPages=5 page=2 additionalClasses='foo'}}`);
   const paginationNode = this.$('ul.pagination.foo');
   assert.ok(paginationNode.length);
+});
+
+test('it renders links for pages around current page at the beginning', function(assert) {
+  this.render(hbs`{{page-numbers totalPages=20 page=1}}`);
+
+  // Prev + 5 visible pages + Next = 7 page item links
+  assert.equal(this.$('.page-item').length, 7);
+
+  assert.ok(this.$('span:contains("Previous")').length);
+  assert.ok(this.$('span:contains("1")').length);
+  assert.ok(this.$('a:contains("2")').length);
+  assert.ok(this.$('a:contains("3")').length);
+  assert.ok(this.$('a:contains("4")').length);
+  assert.ok(this.$('a:contains("5")').length);
+  assert.ok(this.$('a:contains("Next")').length);
+});
+
+test('it renders links for pages around current page nearly at the beginning', function(assert) {
+  this.render(hbs`{{page-numbers totalPages=20 page=2}}`);
+
+  // Prev + 5 visible pages + Next = 7 page item links
+  assert.equal(this.$('.page-item').length, 7);
+
+  assert.ok(this.$('a:contains("Previous")').length);
+  assert.ok(this.$('a:contains("1")').length);
+  assert.ok(this.$('span:contains("2")').length);
+  assert.ok(this.$('a:contains("3")').length);
+  assert.ok(this.$('a:contains("4")').length);
+  assert.ok(this.$('a:contains("5")').length);
+  assert.ok(this.$('a:contains("Next")').length);
+});
+
+test('it renders links for pages around current page in the middle', function(assert) {
+  this.render(hbs`{{page-numbers totalPages=20 page=13}}`);
+
+  // Prev + 5 visible pages + Next = 7 page item links
+  assert.equal(this.$('.page-item').length, 7);
+
+  assert.ok(this.$('a:contains("Previous")').length);
+  assert.ok(this.$('a:contains("11")').length);
+  assert.ok(this.$('a:contains("12")').length);
+  assert.ok(this.$('span:contains("13")').length);
+  assert.ok(this.$('a:contains("14")').length);
+  assert.ok(this.$('a:contains("15")').length);
+  assert.ok(this.$('a:contains("Next")').length);
+});
+
+test('it renders links for pages around current page at the end', function(assert) {
+  this.render(hbs`{{page-numbers totalPages=20 page=20}}`);
+
+  // Prev + 5 visible pages + Next = 7 page item links
+  assert.equal(this.$('.page-item').length, 7);
+
+  assert.ok(this.$('a:contains("Previous")').length);
+  assert.ok(this.$('a:contains("16")').length);
+  assert.ok(this.$('a:contains("17")').length);
+  assert.ok(this.$('a:contains("18")').length);
+  assert.ok(this.$('a:contains("19")').length);
+  assert.ok(this.$('span:contains("20")').length);
+  assert.ok(this.$('span:contains("Next")').length);
+});
+
+test('it renders links for pages around current page almost at the end', function(assert) {
+  this.render(hbs`{{page-numbers totalPages=20 page=19}}`);
+
+  // Prev + 5 visible pages + Next = 7 page item links
+  assert.equal(this.$('.page-item').length, 7);
+
+  assert.ok(this.$('a:contains("Previous")').length);
+  assert.ok(this.$('a:contains("16")').length);
+  assert.ok(this.$('a:contains("17")').length);
+  assert.ok(this.$('a:contains("18")').length);
+  assert.ok(this.$('span:contains("19")').length);
+  assert.ok(this.$('a:contains("20")').length);
+  assert.ok(this.$('a:contains("Next")').length);
 });
